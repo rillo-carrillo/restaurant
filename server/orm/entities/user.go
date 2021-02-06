@@ -10,8 +10,8 @@ type User struct {
 	Password string `json:"password"`
 }
 
-//UserCreationResponse when created return id
-type UserCreationResponse struct {
+//UserResponse when created return id
+type UserResponse struct {
 	ID       uint
 	Username string
 }

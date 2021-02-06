@@ -1,4 +1,4 @@
-package api
+package register
 
 import (
 	"net/http"
@@ -10,26 +10,22 @@ import (
 	"gorm.io/gorm"
 )
 
-type ServeError struct {
-	message string
-}
-
-//User Endpoint Operations
-func User(db *gorm.DB, r *gin.Engine) *gin.Engine {
+//Register Endpoint Operations
+func Register(db *gorm.DB, r *gin.Engine) *gin.Engine {
 	var user orm.User
 	//CreateUser
 	r.POST("/register", func(c *gin.Context) {
 		err := c.BindJSON(&user)
 		if err != nil {
-			var res ServeError
-			res.message = "Somethin went wrong with request: " + err.Error()
+			var res errors.ServerError
+			res.Message = "Somethin went wrong with request: " + err.Error()
 			c.JSON(http.StatusBadRequest, res)
 			return
 		}
 		user.Password, err = utils.GeneratePassword(user.Password)
 		if err != nil {
-			var res ServeError
-			res.message = "Something went wrong when hashing password: " + err.Error()
+			var res errors.ServerError
+			res.Message = "Something went wrong when hashing password: " + err.Error()
 			c.JSON(http.StatusBadRequest, res)
 			return
 		}
@@ -39,7 +35,7 @@ func User(db *gorm.DB, r *gin.Engine) *gin.Engine {
 			c.JSON(http.StatusOK, validationError)
 			return
 		}
-		var userResponse orm.UserCreationResponse
+		var userResponse orm.UserResponse
 		userResponse.ID = user.ID
 		userResponse.Username = user.Username
 		c.JSON(http.StatusOK, userResponse)
