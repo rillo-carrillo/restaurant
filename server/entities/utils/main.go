@@ -1,17 +1,16 @@
 package eutils
 
 import (
-	"testorm/entities"
-
+	"github.com/rillo-carrillo/restaurant/server/entities"
+	orm "github.com/rillo-carrillo/restaurant/server/orm/entities"
 	"gorm.io/gorm"
 )
 
 //CreateEntities func creates the entities and relationships for the tables.
 func CreateEntities(DB *gorm.DB) error {
-	if err := DB.SetupJoinTable(&entities.Order{}, "Products", &entities.OrderProduct{}); err != nil {
-		return err
-	}
-	DB.AutoMigrate(&entities.Restaurant{}, &entities.Category{}, &entities.Role{}, &entities.Employee{}, &entities.Client{}, &entities.Product{}, &entities.Modifier{}, &entities.Order{})
+
+	DB.AutoMigrate(&orm.User{}, &entities.Restaurant{}, &entities.Category{}, &entities.Role{}, &entities.Employee{}, &entities.Client{}, &entities.Product{}, &entities.Modifier{}, &entities.Order{}, &entities.OrderProduct{}, &entities.OrderDetail{})
+
 	return nil
 }
 
@@ -40,15 +39,15 @@ func InitializeDatabase(DB *gorm.DB) error {
 				Name: "Bebidas",
 				Products: []entities.Product{
 					entities.Product{
-						Name:  "Coca Cola",
-						Price: 16,
+						Name: "Coca Cola",
 						Modifiers: []entities.Modifier{
 							entities.Modifier{
 								Description: "Lata 355ml",
+								Price:       16,
 							},
 							entities.Modifier{
 								Description: "Botella Vidrio 500ml",
-								Price:       4,
+								Price:       20,
 							},
 						},
 					},
@@ -58,25 +57,29 @@ func InitializeDatabase(DB *gorm.DB) error {
 				Name: "Desayunos",
 				Products: []entities.Product{
 					entities.Product{
-						Name:     "Huevos Al gusto",
-						Price:    60,
-						Comments: "Termino medio.",
+						Name: "Huevos Al gusto",
+
 						Modifiers: []entities.Modifier{
 							entities.Modifier{
 								Description: "Sin salsa",
+								Price:       60,
 							},
 						},
 					},
 					entities.Product{
-						Name:     "Chilaquiles",
-						Price:    60,
-						Comments: "Termino medio.",
+						Name: "Chilaquiles",
 						Modifiers: []entities.Modifier{
 							entities.Modifier{
 								Description: "Verdes",
+								Price:       60,
 							},
 							entities.Modifier{
 								Description: "Rojos",
+								Price:       60,
+							},
+							entities.Modifier{
+								Description: "Combinados",
+								Price:       60,
 							},
 							entities.Modifier{
 								Description: "Pollo",
@@ -94,17 +97,19 @@ func InitializeDatabase(DB *gorm.DB) error {
 				Name: "Infantil",
 				Products: []entities.Product{
 					entities.Product{
-						Name:  "Hot Cakes",
-						Price: 35,
+						Name: "Hot Cakes",
 						Modifiers: []entities.Modifier{
 							entities.Modifier{
 								Description: "Chocomilk",
+								Price:       35,
 							},
 							entities.Modifier{
 								Description: "Jugo",
+								Price:       35,
 							},
 							entities.Modifier{
 								Description: "Fruta",
+								Price:       35,
 							},
 						},
 					},
@@ -139,15 +144,6 @@ func InitializeDatabase(DB *gorm.DB) error {
 	order := entities.Order{}
 	DB.Model(&emp).Association("Order").Append(&order)
 	coca := entities.Product{}
-	DB.First(&coca, "id=?", 1)
-	coca2 := entities.Product{}
-	DB.First(&coca2, "id=?", 1)
-	mod1 := entities.Modifier{}
-	DB.First(&mod1, "id=?",1)
-	mod2 := entities.Modifier{}
-	DB.First(&mod2, "id=?",2)
-	mod2:=
-	DB.Model(&coca).Association("Modifiers").
 	huevos := entities.Product{}
 	DB.First(&huevos, "id=?", 2)
 	DB.Model(&order).Association("Products").Append(&coca, &huevos)

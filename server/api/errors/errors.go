@@ -21,6 +21,7 @@ type ServerError struct {
 const (
 	//
 	duplicated = "23505"
+	relation   = "42P01"
 )
 
 //ValidateUserErrors with DB
@@ -29,6 +30,9 @@ func ValidateUserErrors(err error) (res DBErrorResponse) {
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		res.Field = "username"
 		res.Message = "username not found."
+	} else if strings.Contains(val, relation) {
+		res.Field = "error"
+		res.Message = "something went wrong with the DB. please contact administrator."
 	} else if strings.Contains(val, duplicated) {
 		res.Field = "username"
 		res.Message = "username already exists."
