@@ -3,6 +3,7 @@ package eutils
 import (
 	"github.com/rillo-carrillo/restaurant/server/entities"
 	orm "github.com/rillo-carrillo/restaurant/server/orm/entities"
+	"github.com/rillo-carrillo/restaurant/server/utils"
 	"gorm.io/gorm"
 )
 
@@ -136,10 +137,21 @@ func InitializeDatabase(DB *gorm.DB) error {
 	if err := DB.Create(&restaurant); err.Error != nil {
 		return err.Error
 	}
-	emp := entities.Employee{
-		Name:   "Mesero 1",
-		RoleID: 6,
+	pass, _ := utils.GeneratePassword("admin")
+	adm := entities.Employee{
+		Name:     "Admin",
+		RoleID:   1,
+		Username: "admin",
+		Password: pass,
 	}
+	pass, _ = utils.GeneratePassword("mesero1")
+	emp := entities.Employee{
+		Name:     "Mesero 1",
+		RoleID:   6,
+		Username: "mesero1",
+		Password: pass,
+	}
+	DB.Model(&restaurant).Association("Employees").Append(&adm)
 	DB.Model(&restaurant).Association("Employees").Append(&emp)
 	order := entities.Order{}
 	DB.Model(&emp).Association("Order").Append(&order)

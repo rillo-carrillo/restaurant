@@ -9,4 +9,6 @@ type Employee struct {
 	RestaurantID uint
 	RoleID       int
 	Order        []Order
+	Username     string
+	Password     string
 }
