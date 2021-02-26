@@ -1,0 +1,177 @@
+basePath: /
+definitions:
+  errors.ServerError:
+    properties:
+      message:
+        type: string
+    type: object
+  model.OrderCreateResponse:
+    properties:
+      id:
+        type: integer
+      status:
+        type: boolean
+    type: object
+  orm.StatusResponse:
+    properties:
+      status:
+        type: boolean
+    type: object
+  orm.UserResponse:
+    properties:
+      id:
+        type: integer
+      username:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    name: restaurant.io Support
+  description: This is the api for the Restaurant.io application
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Restaurant.io API
+  version: "1.0"
+paths:
+  /v1/login:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/orm.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ServerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.ServerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ServerError'
+      summary: Create new User
+      tags:
+      - Login
+  /v1/orders:
+    delete:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/orm.StatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ServerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.ServerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ServerError'
+      summary: Loout User
+      tags:
+      - Login
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/orm.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ServerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.ServerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ServerError'
+      summary: Login User
+      tags:
+      - Login
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.OrderCreateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ServerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.ServerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ServerError'
+      summary: Create an order
+      tags:
+      - Orders
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+  BasicAuth:
+    type: basic
+  OAuth2AccessCode:
+    authorizationUrl: https://example.com/oauth/authorize
+    flow: accessCode
+    scopes:
+      admin: ' Grants read and write access to administrative information'
+    tokenUrl: https://example.com/oauth/token
+    type: oauth2
+  OAuth2Application:
+    flow: application
+    scopes:
+      admin: ' Grants read and write access to administrative information'
+      write: ' Grants write access'
+    tokenUrl: https://example.com/oauth/token
+    type: oauth2
+  OAuth2Implicit:
+    authorizationUrl: https://example.com/oauth/authorize
+    flow: implicit
+    scopes:
+      admin: ' Grants read and write access to administrative information'
+      write: ' Grants write access'
+    type: oauth2
+  OAuth2Password:
+    flow: password
+    scopes:
+      admin: ' Grants read and write access to administrative information'
+      read: ' Grants read access'
+      write: ' Grants write access'
+    tokenUrl: https://example.com/oauth/token
+    type: oauth2
+swagger: "2.0"
