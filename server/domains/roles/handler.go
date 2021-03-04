@@ -1,4 +1,4 @@
-package controller
+package roles
 
 import (
 	"net/http"
@@ -11,7 +11,7 @@ import (
 )
 
 //GetRoles godoc
-func (ctr *Controller) GetRoles(c *gin.Context) {
+func GetRoles(c *gin.Context) {
 	var roles []entities.Role
 	if err := db.Connection.Order("code").Find(&roles).Error; err != nil {
 		var res errors.DBErrorResponse
@@ -23,7 +23,7 @@ func (ctr *Controller) GetRoles(c *gin.Context) {
 }
 
 //CreateRole godoc
-func (ctr *Controller) CreateRole(c *gin.Context) {
+func CreateRole(c *gin.Context) {
 	var role entities.Role
 	if err := c.BindJSON(&role); err != nil {
 		var res errors.DBErrorResponse
@@ -41,7 +41,7 @@ func (ctr *Controller) CreateRole(c *gin.Context) {
 }
 
 //DeleteRole godoc
-func (ctr *Controller) DeleteRole(c *gin.Context) {
+func DeleteRole(c *gin.Context) {
 	pID := c.Param("id")
 	id, err := strconv.ParseInt(pID, 10, 0)
 	if err != nil {
@@ -61,7 +61,7 @@ func (ctr *Controller) DeleteRole(c *gin.Context) {
 }
 
 //UpdateRole godoc
-func (ctr *Controller) UpdateRole(c *gin.Context) {
+func UpdateRole(c *gin.Context) {
 	var uRole entities.Role
 	if err := c.BindJSON(&uRole); err != nil {
 		var res errors.DBErrorResponse
@@ -84,4 +84,15 @@ func (ctr *Controller) UpdateRole(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, role)
+}
+
+//Handler Define routes of type.
+func Handler(g *gin.RouterGroup) {
+	roles := g.Group("/roles")
+	{
+		roles.GET("", GetRoles)
+		roles.POST("", CreateRole)
+		roles.DELETE(":id", DeleteRole)
+		roles.PUT("", UpdateRole)
+	}
 }

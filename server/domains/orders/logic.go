@@ -1,13 +1,12 @@
-package functions
+package orders
 
 import (
 	"github.com/rillo-carrillo/restaurant/server/db"
 	"github.com/rillo-carrillo/restaurant/server/entities"
-	"github.com/rillo-carrillo/restaurant/server/model"
 )
 
-//CreateOrder handles the creation of order.
-func CreateOrder(id uint, or *model.OrderRequest) (uint, error) {
+//CreateOrderLogic handles the creation of order.
+func CreateOrderLogic(id uint, or *OrderRequest) (uint, error) {
 	order := entities.Order{
 		EmployeeID: id,
 		ClientID:   or.Client,

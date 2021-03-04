@@ -1,4 +1,4 @@
-package model
+package orders
 
 //OrderDetails array with Entity definition
 type OrderDetails struct {

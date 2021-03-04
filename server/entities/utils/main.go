@@ -2,7 +2,6 @@ package eutils
 
 import (
 	"github.com/rillo-carrillo/restaurant/server/entities"
-	orm "github.com/rillo-carrillo/restaurant/server/orm/entities"
 	"github.com/rillo-carrillo/restaurant/server/utils"
 	"gorm.io/gorm"
 )
@@ -10,7 +9,7 @@ import (
 //CreateEntities func creates the entities and relationships for the tables.
 func CreateEntities(DB *gorm.DB) error {
 
-	DB.AutoMigrate(&orm.User{}, &entities.Restaurant{}, &entities.Category{}, &entities.Role{}, &entities.Employee{}, &entities.Client{}, &entities.Product{}, &entities.Modifier{}, &entities.Order{}, &entities.OrderProduct{}, &entities.OrderDetail{})
+	DB.AutoMigrate(&entities.Restaurant{}, &entities.Category{}, &entities.Role{}, &entities.Employee{}, &entities.Client{}, &entities.Product{}, &entities.Modifier{}, &entities.Order{}, &entities.OrderProduct{}, &entities.OrderDetail{})
 
 	return nil
 }

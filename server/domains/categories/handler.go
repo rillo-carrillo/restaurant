@@ -1,4 +1,4 @@
-package controller
+package categories
 
 import (
 	"net/http"
@@ -18,7 +18,7 @@ import (
 // @Failure 404 {object} errors.ServerError
 // @Failure 500 {object} errors.ServerError
 // @Router /v1/categories [get]
-func (ctr *Controller) GetCategories(c *gin.Context) {
+func GetCategories(c *gin.Context) {
 	var categorias []entities.Category
 	if err := db.Connection.Find(&categorias).Error; err != nil {
 		var res errors.DBErrorResponse
@@ -26,4 +26,12 @@ func (ctr *Controller) GetCategories(c *gin.Context) {
 		c.JSON(http.StatusOK, res)
 	}
 	c.JSON(http.StatusOK, categorias)
+}
+
+//Handler Define routes of type.
+func Handler(g *gin.RouterGroup) {
+	categories := g.Group("/categorias")
+	{
+		categories.GET("", GetCategories)
+	}
 }

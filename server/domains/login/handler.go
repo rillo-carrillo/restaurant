@@ -1,4 +1,4 @@
-package controller
+package login
 
 import (
 	"fmt"
@@ -10,9 +10,6 @@ import (
 	"github.com/rillo-carrillo/restaurant/server/consts"
 	"github.com/rillo-carrillo/restaurant/server/db"
 	"github.com/rillo-carrillo/restaurant/server/entities"
-	"github.com/rillo-carrillo/restaurant/server/model"
-	orm "github.com/rillo-carrillo/restaurant/server/orm/entities"
-	"github.com/rillo-carrillo/restaurant/server/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -26,7 +23,7 @@ import (
 // @Failure 404 {object} errors.ServerError
 // @Failure 500 {object} errors.ServerError
 // @Router /v1/orders [post]
-func (ctr *Controller) Login(c *gin.Context) {
+func Login(c *gin.Context) {
 	var user entities.Employee
 	session := sessions.Default(c)
 	err := c.BindJSON(&user)
@@ -62,13 +59,11 @@ func (ctr *Controller) Login(c *gin.Context) {
 		fmt.Println(err)
 		return
 	}
-	//Generate response
-	response := orm.UserResponse{
-		ID:       user.ID,
-		Username: user.Username,
-		RoleID:   user.RoleID,
-	}
-	c.JSON(http.StatusOK, response)
+
+	c.JSON(http.StatusOK, gin.H{
+		"ID":       user.ID,
+		"Username": user.Username,
+		"RoleID":   user.RoleID})
 
 }
 
@@ -82,62 +77,20 @@ func (ctr *Controller) Login(c *gin.Context) {
 // @Failure 404 {object} errors.ServerError
 // @Failure 500 {object} errors.ServerError
 // @Router /v1/orders [delete]
-func (ctr *Controller) Logout(c *gin.Context) {
+func Logout(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Clear()
 	session.Save()
-	res := orm.StatusResponse{Status: true}
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, gin.H{
+		"status": true,
+	})
 }
 
-// CreateUser godoc
-// @Summary Create new User
-// @Tags Login
-// @Accept  json
-// @Produce  json
-// @Success 200 {object} orm.UserResponse
-// @Failure 400 {object} errors.ServerError
-// @Failure 404 {object} errors.ServerError
-// @Failure 500 {object} errors.ServerError
-// @Router /v1/login [post]
-func (ctr *Controller) CreateUser(c *gin.Context) {
-	var user model.User
-	err := c.BindJSON(&user)
-	if err != nil {
-		var res errors.ServerError
-		res.Message = "Somethin went wrong with request: " + err.Error()
-		c.JSON(http.StatusBadRequest, res)
-		return
+//Handler Define routes of type.
+func Handler(g *gin.RouterGroup) {
+	login := g.Group("/login")
+	{
+		login.POST("", Login)
+		login.DELETE("", Logout)
 	}
-	user.Password, err = utils.GeneratePassword(user.Password)
-	if err != nil {
-		var res errors.ServerError
-		res.Message = "Something went wrong when hashing password: " + err.Error()
-		c.JSON(http.StatusBadRequest, res)
-		return
-	}
-	res := db.SaveToDB(&user)
-	if res != nil {
-		validationError := errors.ValidateUserErrors(res)
-		c.JSON(http.StatusConflict, validationError)
-		return
-	}
-	var userResponse orm.UserResponse
-	userResponse.ID = user.ID
-	userResponse.Username = user.Username
-	c.JSON(http.StatusOK, userResponse)
-}
-
-//Me  Get user info from session and return it
-func (ctr *Controller) Me(c *gin.Context) {
-	session := sessions.Default(c)
-	userid := session.Get(consts.CookieUserIdKey)
-	roleid := session.Get("roleID")
-	var user entities.Employee
-	if userid != nil && roleid != nil {
-		user.ID = userid.(uint)
-		user.RoleID = roleid.(int)
-	}
-	c.JSON(http.StatusOK, user)
-
 }

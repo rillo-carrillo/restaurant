@@ -1,13 +1,4 @@
-package model
-
-import "gorm.io/gorm"
-
-//User model for ORM
-type User struct {
-	gorm.Model
-	Username string `json:"username" gorm:"unique"`
-	Password string `json:"password"`
-}
+package login
 
 //UserResponse when created return id
 type UserResponse struct {

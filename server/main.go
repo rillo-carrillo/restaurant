@@ -7,9 +7,15 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/rillo-carrillo/restaurant/server/consts"
-	"github.com/rillo-carrillo/restaurant/server/controller"
 	"github.com/rillo-carrillo/restaurant/server/db"
 	_ "github.com/rillo-carrillo/restaurant/server/docs"
+	"github.com/rillo-carrillo/restaurant/server/domains/categories"
+	"github.com/rillo-carrillo/restaurant/server/domains/employees"
+	"github.com/rillo-carrillo/restaurant/server/domains/login"
+	"github.com/rillo-carrillo/restaurant/server/domains/me"
+	"github.com/rillo-carrillo/restaurant/server/domains/orders"
+	"github.com/rillo-carrillo/restaurant/server/domains/restaurants"
+	"github.com/rillo-carrillo/restaurant/server/domains/roles"
 	eutils "github.com/rillo-carrillo/restaurant/server/entities/utils"
 	"github.com/rillo-carrillo/restaurant/server/utils"
 	swaggerFiles "github.com/swaggo/files"
@@ -38,48 +44,16 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	r.Use(sessions.Sessions(name, store),
 		cors.New(corsConf))
 
-	c := controller.NewController()
 	v1 := r.Group("/v1")
 	{
-		orders := v1.Group("/orders")
-		{
-			orders.POST("", c.CreateOrder)
-		}
-		login := v1.Group("/login")
-		{
-			login.POST("", c.Login)
-			//login.POST("", c.CreateUser)
-			login.DELETE("", c.Logout)
-		}
-		categories := v1.Group("/categorias")
-		{
-			categories.GET("", c.GetCategories)
-		}
-		restaurants := v1.Group("/restaurants")
-		{
-			restaurants.GET("", c.GetRestaurants)
-			restaurants.POST("", c.CreateRestaurant)
-			restaurants.DELETE(":id", c.DeleteRestaurant)
-			restaurants.PUT("", c.UpdateRestaurant)
-		}
-		roles := v1.Group("/roles")
-		{
-			roles.GET("", c.GetRoles)
-			roles.POST("", c.CreateRole)
-			roles.DELETE(":id", c.DeleteRole)
-			roles.PUT("", c.UpdateRole)
-		}
-		employees := v1.Group("/empleados")
-		{
-			employees.GET("", c.GetEmployees)
-			employees.POST("", c.CreateEmployee)
-			employees.DELETE(":id", c.DeleteEmployee)
-			employees.PUT(":change", c.UpdateEmployee)
-		}
-		me := v1.Group("/me")
-		{
-			me.GET("", c.Me)
-		}
+		orders.Handler(v1)
+		restaurants.Handler(v1)
+		roles.Handler(v1)
+		me.Handler(v1)
+		employees.Handler(v1)
+		categories.Handler(v1)
+		login.Handler(v1)
+
 	}
 	url := ginSwagger.URL("http://localhost:8080/swagger/doc.json") // The url pointing to API definition
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))

@@ -1,4 +1,4 @@
-package controller
+package orders
 
 import (
 	"net/http"
@@ -8,8 +8,6 @@ import (
 	"github.com/rillo-carrillo/restaurant/server/api/errors"
 	apiutils "github.com/rillo-carrillo/restaurant/server/api/utils"
 	"github.com/rillo-carrillo/restaurant/server/consts"
-	"github.com/rillo-carrillo/restaurant/server/functions"
-	"github.com/rillo-carrillo/restaurant/server/model"
 )
 
 // CreateOrder godoc
@@ -22,8 +20,8 @@ import (
 // @Failure 404 {object} errors.ServerError
 // @Failure 500 {object} errors.ServerError
 // @Router /v1/orders [post]
-func (ctx *Controller) CreateOrder(c *gin.Context) {
-	var or model.OrderRequest
+func CreateOrder(c *gin.Context) {
+	var or OrderRequest
 	session := sessions.Default(c)
 	userID := session.Get(consts.CookieUserIdKey)
 
@@ -46,16 +44,24 @@ func (ctx *Controller) CreateOrder(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, res)
 		return
 	}
-	id, err := functions.CreateOrder(ID, &or)
+	id, err := CreateOrderLogic(ID, &or)
 	if err != nil {
 		var res errors.ServerError
 		res.Message = "Somethin went wrong with request: " + err.Error()
 		c.JSON(http.StatusBadRequest, res)
 		return
 	}
-	res := model.OrderCreateResponse{
+	res := OrderCreateResponse{
 		ID:     int(id),
 		Status: true,
 	}
 	c.JSON(http.StatusOK, res)
+}
+
+//Handler Define routes of type.
+func Handler(g *gin.RouterGroup) {
+	orders := g.Group("/orders")
+	{
+		orders.POST("", CreateOrder)
+	}
 }

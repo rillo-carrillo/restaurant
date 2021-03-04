@@ -1,4 +1,4 @@
-package controller
+package employees
 
 import (
 	"net/http"
@@ -8,10 +8,11 @@ import (
 	"github.com/rillo-carrillo/restaurant/server/api/errors"
 	"github.com/rillo-carrillo/restaurant/server/db"
 	"github.com/rillo-carrillo/restaurant/server/entities"
+	"github.com/rillo-carrillo/restaurant/server/utils"
 )
 
 //GetEmployees godoc
-func (ctr *Controller) GetEmployees(c *gin.Context) {
+func GetEmployees(c *gin.Context) {
 	var emps []entities.Employee
 	if err := db.Connection.Find(&emps).Error; err != nil {
 		var res errors.DBErrorResponse
@@ -19,11 +20,15 @@ func (ctr *Controller) GetEmployees(c *gin.Context) {
 		c.JSON(http.StatusOK, res)
 		return
 	}
+	for idx := range emps {
+		emp := &emps[idx]
+		emp.Password = "*****"
+	}
 	c.JSON(http.StatusOK, emps)
 }
 
 //CreateEmployee godoc
-func (ctr *Controller) CreateEmployee(c *gin.Context) {
+func CreateEmployee(c *gin.Context) {
 	var emp entities.Employee
 	if err := c.BindJSON(&emp); err != nil {
 		var res errors.DBErrorResponse
@@ -31,6 +36,7 @@ func (ctr *Controller) CreateEmployee(c *gin.Context) {
 		c.JSON(http.StatusOK, res)
 		return
 	}
+	emp.Password, _ = utils.GeneratePassword(emp.Password)
 	if err := db.Connection.Save(&emp).Error; err != nil {
 		var res errors.DBErrorResponse
 		res.Message = err.Error()
@@ -41,7 +47,7 @@ func (ctr *Controller) CreateEmployee(c *gin.Context) {
 }
 
 //DeleteEmployee godoc
-func (ctr *Controller) DeleteEmployee(c *gin.Context) {
+func DeleteEmployee(c *gin.Context) {
 	pID := c.Param("id")
 	id, err := strconv.ParseInt(pID, 10, 0)
 	if err != nil {
@@ -61,8 +67,7 @@ func (ctr *Controller) DeleteEmployee(c *gin.Context) {
 }
 
 //UpdateEmployee godoc
-func (ctr *Controller) UpdateEmployee(c *gin.Context) {
-	change := c.Param("change")
+func UpdateEmployee(c *gin.Context) {
 	var uEmp entities.Employee
 	if err := c.BindJSON(&uEmp); err != nil {
 		var res errors.DBErrorResponse
@@ -81,8 +86,8 @@ func (ctr *Controller) UpdateEmployee(c *gin.Context) {
 	emp.RestaurantID = uEmp.RestaurantID
 	emp.RoleID = uEmp.RoleID
 	emp.Username = uEmp.Username
-	if change == "true" {
-		emp.Password = uEmp.Password
+	if len(uEmp.Password) > 3 {
+		emp.Password, _ = utils.GeneratePassword(uEmp.Password)
 	}
 
 	if err := db.Connection.Save(&emp).Error; err != nil {
@@ -92,4 +97,15 @@ func (ctr *Controller) UpdateEmployee(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, emp)
+}
+
+//Handler Define routes of type.
+func Handler(g *gin.RouterGroup) {
+	employees := g.Group("/empleados")
+	{
+		employees.GET("", GetEmployees)
+		employees.POST("", CreateEmployee)
+		employees.DELETE(":id", DeleteEmployee)
+		employees.PUT("", UpdateEmployee)
+	}
 }

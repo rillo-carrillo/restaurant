@@ -1,4 +1,4 @@
-package controller
+package restaurants
 
 import (
 	"net/http"
@@ -19,7 +19,7 @@ import (
 // @Failure 404 {object} errors.ServerError
 // @Failure 500 {object} errors.ServerError
 // @Router /v1/restaurants [get]
-func (ctr *Controller) GetRestaurants(c *gin.Context) {
+func GetRestaurants(c *gin.Context) {
 	var restaurants []entities.Restaurant
 	if err := db.Connection.Find(&restaurants).Error; err != nil {
 		var res errors.DBErrorResponse
@@ -39,7 +39,7 @@ func (ctr *Controller) GetRestaurants(c *gin.Context) {
 // @Failure 404 {object} errors.ServerError
 // @Failure 500 {object} errors.ServerError
 // @Router /v1/restaurants [post]
-func (ctr *Controller) CreateRestaurant(c *gin.Context) {
+func CreateRestaurant(c *gin.Context) {
 	var restaurant entities.Restaurant
 	if err := c.BindJSON(&restaurant); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -65,7 +65,7 @@ func (ctr *Controller) CreateRestaurant(c *gin.Context) {
 // @Failure 404 {object} errors.ServerError
 // @Failure 500 {object} errors.ServerError
 // @Router /v1/restaurants [delete]
-func (ctr *Controller) DeleteRestaurant(c *gin.Context) {
+func DeleteRestaurant(c *gin.Context) {
 	parID := c.Param("id")
 	var restaurant entities.Restaurant
 	id, err := strconv.ParseInt(parID, 10, 0)
@@ -102,7 +102,7 @@ func (ctr *Controller) DeleteRestaurant(c *gin.Context) {
 // @Failure 404 {object} errors.ServerError
 // @Failure 500 {object} errors.ServerError
 // @Router /v1/restaurants [put]
-func (ctr *Controller) UpdateRestaurant(c *gin.Context) {
+func UpdateRestaurant(c *gin.Context) {
 	var newRest entities.Restaurant
 	if err := c.BindJSON(&newRest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -132,4 +132,15 @@ func (ctr *Controller) UpdateRestaurant(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status": "OK",
 	})
+}
+
+//Handler Define routes of type.
+func Handler(g *gin.RouterGroup) {
+	restaurants := g.Group("/restaurants")
+	{
+		restaurants.GET("", GetRestaurants)
+		restaurants.POST("", CreateRestaurant)
+		restaurants.DELETE(":id", DeleteRestaurant)
+		restaurants.PUT("", UpdateRestaurant)
+	}
 }
