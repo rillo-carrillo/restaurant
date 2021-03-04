@@ -14,6 +14,7 @@ type User struct {
 type UserResponse struct {
 	ID       uint
 	Username string
+	RoleID   int
 }
 
 //StatusResponse only reply with a true or false

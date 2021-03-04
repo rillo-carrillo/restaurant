@@ -6,7 +6,7 @@ type Restaurant struct {
 	Name       string `gorm:"unique"`
 	Address    string
 	Number     int
-	CP         int
+	CP         string `gorm:"size:5"`
 	RFC        string `gorm:"size:13"`
 	Logo       []byte
 	Categories []Category `gorm:"constraint:,OnDelete:CASCADE;"`

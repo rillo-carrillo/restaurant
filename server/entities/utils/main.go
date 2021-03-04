@@ -32,7 +32,7 @@ func InitializeDatabase(DB *gorm.DB) error {
 	restaurant := entities.Restaurant{
 		Name:    "El Meson de Priscila",
 		Address: "Calle Tezozomoc 4493 int 1, Zapopan, Jalisco",
-		CP:      45050,
+		CP:      "45050",
 		Number:  4493,
 		RFC:     "AAAA000000XXX",
 		Categories: []entities.Category{

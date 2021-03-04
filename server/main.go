@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/rillo-carrillo/restaurant/server/consts"
@@ -28,7 +29,15 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	// 	MaxAge: 1000 * 60 * 60 * 24 * 3,
 	// })
 	store := utils.CreateNewStore()
-	r.Use(sessions.Sessions(name, store))
+	corsConf := cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000", "http://192.168.15.6:3000"},
+		AllowMethods:     []string{"GET", "POST", "DELETE", "PUT"},
+		AllowCredentials: true,
+		AllowHeaders:     []string{"content-type"},
+	}
+	r.Use(sessions.Sessions(name, store),
+		cors.New(corsConf))
+
 	c := controller.NewController()
 	v1 := r.Group("/v1")
 	{
@@ -38,9 +47,38 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 		}
 		login := v1.Group("/login")
 		{
-			login.GET("", c.Login)
-			login.POST("", c.CreateUser)
+			login.POST("", c.Login)
+			//login.POST("", c.CreateUser)
 			login.DELETE("", c.Logout)
+		}
+		categories := v1.Group("/categorias")
+		{
+			categories.GET("", c.GetCategories)
+		}
+		restaurants := v1.Group("/restaurants")
+		{
+			restaurants.GET("", c.GetRestaurants)
+			restaurants.POST("", c.CreateRestaurant)
+			restaurants.DELETE(":id", c.DeleteRestaurant)
+			restaurants.PUT("", c.UpdateRestaurant)
+		}
+		roles := v1.Group("/roles")
+		{
+			roles.GET("", c.GetRoles)
+			roles.POST("", c.CreateRole)
+			roles.DELETE(":id", c.DeleteRole)
+			roles.PUT("", c.UpdateRole)
+		}
+		employees := v1.Group("/empleados")
+		{
+			employees.GET("", c.GetEmployees)
+			employees.POST("", c.CreateEmployee)
+			employees.DELETE(":id", c.DeleteEmployee)
+			employees.PUT(":change", c.UpdateEmployee)
+		}
+		me := v1.Group("/me")
+		{
+			me.GET("", c.Me)
 		}
 	}
 	url := ginSwagger.URL("http://localhost:8080/swagger/doc.json") // The url pointing to API definition

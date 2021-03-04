@@ -28,8 +28,9 @@ func CreateNewStore() redis.Store {
 		panic("something when wrong")
 	}
 	options := sessions.Options{
-		MaxAge:   1000 * 60 * 60 * 24 * 7,
-		HttpOnly: true,
+		MaxAge:   60 * 15,
+		HttpOnly: false,
+		Path:     "/",
 	}
 	store.Options(options)
 	return store

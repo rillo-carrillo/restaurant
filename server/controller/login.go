@@ -9,6 +9,7 @@ import (
 	"github.com/rillo-carrillo/restaurant/server/api/errors"
 	"github.com/rillo-carrillo/restaurant/server/consts"
 	"github.com/rillo-carrillo/restaurant/server/db"
+	"github.com/rillo-carrillo/restaurant/server/entities"
 	"github.com/rillo-carrillo/restaurant/server/model"
 	orm "github.com/rillo-carrillo/restaurant/server/orm/entities"
 	"github.com/rillo-carrillo/restaurant/server/utils"
@@ -24,9 +25,9 @@ import (
 // @Failure 400 {object} errors.ServerError
 // @Failure 404 {object} errors.ServerError
 // @Failure 500 {object} errors.ServerError
-// @Router /v1/orders [get]
+// @Router /v1/orders [post]
 func (ctr *Controller) Login(c *gin.Context) {
-	var user model.User
+	var user entities.Employee
 	session := sessions.Default(c)
 	err := c.BindJSON(&user)
 	password := user.Password
@@ -55,6 +56,7 @@ func (ctr *Controller) Login(c *gin.Context) {
 	}
 	//create a cookieSession
 	session.Set(consts.CookieUserIdKey, user.ID)
+	session.Set("roleID", user.RoleID)
 	err = session.Save()
 	if err != nil {
 		fmt.Println(err)
@@ -64,6 +66,7 @@ func (ctr *Controller) Login(c *gin.Context) {
 	response := orm.UserResponse{
 		ID:       user.ID,
 		Username: user.Username,
+		RoleID:   user.RoleID,
 	}
 	c.JSON(http.StatusOK, response)
 
@@ -81,7 +84,7 @@ func (ctr *Controller) Login(c *gin.Context) {
 // @Router /v1/orders [delete]
 func (ctr *Controller) Logout(c *gin.Context) {
 	session := sessions.Default(c)
-	session.Delete(consts.CookieUserIdKey)
+	session.Clear()
 	session.Save()
 	res := orm.StatusResponse{Status: true}
 	c.JSON(http.StatusOK, res)
@@ -123,4 +126,18 @@ func (ctr *Controller) CreateUser(c *gin.Context) {
 	userResponse.ID = user.ID
 	userResponse.Username = user.Username
 	c.JSON(http.StatusOK, userResponse)
+}
+
+//Me  Get user info from session and return it
+func (ctr *Controller) Me(c *gin.Context) {
+	session := sessions.Default(c)
+	userid := session.Get(consts.CookieUserIdKey)
+	roleid := session.Get("roleID")
+	var user entities.Employee
+	if userid != nil && roleid != nil {
+		user.ID = userid.(uint)
+		user.RoleID = roleid.(int)
+	}
+	c.JSON(http.StatusOK, user)
+
 }

@@ -8,11 +8,9 @@ import {
   FormErrorMessage,
 } from "@chakra-ui/react";
 import { useField } from "formik";
-const InputField = ({ id, label, err, ...props }) => {
-  const [field, { error }] = useField(props);
+const InputField = ({ id, label, error, ...props }) => {
+  const [field, _] = useField(props);
   let C = Input;
-  console.log(error !== undefined);
-  console.log(error);
   return (
     <Box mt={4}>
       <FormControl id={id} isInvalid={!!error}>
